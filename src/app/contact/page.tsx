@@ -1,12 +1,14 @@
 "use client";
-import React, { useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import { Linkedin, Instagram } from "lucide-react";
-import { FaArrowRight, FaChevronDown } from "react-icons/fa";
-import Link from "next/link";
+import { FaArrowRight } from "react-icons/fa";
+/* import Link from "next/link";
+ */import Navbar from "@/components/Navbar";
+import { useUser } from "@clerk/nextjs";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function ContactPage() {
-  const [openMenu, setOpenMenu] = useState(false);
-
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -14,123 +16,69 @@ export default function ContactPage() {
     message: "",
   });
 
-  const handleChange = (e:React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const { isSignedIn, user, isLoaded } = useUser();
+  const [loading, setLoading] = useState(false);
+
+  // Prefill form data if user is signed in
+  useEffect(() => {
+    if (isLoaded && isSignedIn && user) {
+      const nameParts = (user.fullName || "").split(" ");
+      setFormData({
+        firstName: nameParts[0] || "",
+        lastName: nameParts.slice(1).join(" ") || "",
+        email: user.primaryEmailAddress?.emailAddress || "",
+        message: "",
+      });
+    }
+  }, [isLoaded, isSignedIn, user]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
-    alert("Message sent successfully!");
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    console.log("Form submitted:", formData);
+    setTimeout(() => setLoading(false), 2000);
+    toast.success("Message sent successfully!")
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen dark:bg-black bg-white">
       {/* NAVIGATION */}
-
-      <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] sm:w-auto">
-        {/* DESKTOP NAV */}
-        <div className="hidden sm:flex items-center space-x-6 bg-black text-white rounded-xl shadow-lg px-6 py-3">
-          <Link href={"/"}>
-            <div className="w-8 h-8 bg-gradient-to-b from-yellow-200 to-orange-900 rounded-[100%_0%_66%_34%_/_65%_0%_100%_35%] rotate-315"></div>
-          </Link>
-
-          <button className="flex items-center space-x-1 hover:text-gray-300">
-            <span>Features</span>
-            <FaChevronDown size={12} />
-          </button>
-          <button className="flex items-center space-x-1 hover:text-gray-300">
-            <span>Resources</span>
-            <FaChevronDown size={12} />
-          </button>
-          <button className="flex items-center space-x-1 hover:text-gray-300">
-            <span>Company</span>
-            <FaChevronDown size={12} />
-          </button>
-
-          <button className="bg-white text-gray-800 px-4 py-2 rounded-md hover:bg-gray-100">
-            Contact us
-          </button>
-        </div>
-
-        {/* MOBILE NAV */}
-        <div className="sm:hidden bg-black text-white rounded-xl shadow-lg px-4 py-3 flex items-center justify-between">
-          <Link href={"/"}>
-            <div className="w-8 h-8 bg-gradient-to-b from-yellow-200 to-orange-900 rounded-[100%_0%_66%_34%_/_65%_0%_100%_35%] rotate-315"></div>
-          </Link>
-          {/* Hamburger Button */}
-          <button
-            onClick={() => setOpenMenu(!openMenu)}
-            className="text-white focus:outline-none"
-          >
-            <svg
-              className="w-7 h-7"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
-        </div>
-
-        {/* MOBILE MENU DROPDOWN */}
-        {openMenu && (
-          <div className="sm:hidden bg-black text-white mt-2 rounded-xl shadow-lg p-4 space-y-4">
-            <button className="flex items-center space-x-1 w-full text-left hover:text-gray-300">
-              <span>Features</span>
-              <FaChevronDown size={12} />
-            </button>
-            <button className="flex items-center space-x-1 w-full text-left hover:text-gray-300">
-              <span>Resources</span>
-              <FaChevronDown size={12} />
-            </button>
-            <button className="flex items-center space-x-1 w-full text-left hover:text-gray-300">
-              <span>Company</span>
-              <FaChevronDown size={12} />
-            </button>
-
-            <button className="w-full bg-white text-gray-800 px-4 py-2 rounded-md hover:bg-gray-100">
-              Contact us
-            </button>
-          </div>
-        )}
-      </nav>
+      <Navbar />
 
       {/* MAIN */}
       <div className="max-w-7xl mx-auto px-4 pt-40 sm:pt-52 lg:pt-60 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* LEFT TEXT */}
+          {/* LEFT SECTION */}
           <div>
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-4xl sm:text-5xl font-bold dark:text-white text-gray-900 leading-tight">
               Get in — <br /> touch with us
             </h1>
 
-            <p className="text-gray-600 mt-6 mb-8 leading-relaxed">
-              We&apos;re here to help! Whether you have a question about our services
-              or need assistance, our team is ready to assist you.
+            <p className="text-gray-600 dark:text-white  mt-6 mb-8 leading-relaxed">
+              We&apos;re here to help! Whether you have a question about our
+              services or need assistance, our team is ready to assist you.
             </p>
 
             <div className="space-y-4 mb-8">
               <div>
-                <p className="text-gray-600 text-sm mb-1">Email:</p>
-                <a className="text-gray-900 font-semibold text-lg hover:text-blue-600">
+                <p className="text-gray-600 dark:text-white  text-sm mb-1">Email:</p>
+                <a className="text-gray-900 dark:text-white  font-semibold text-lg hover:text-blue-600">
                   hello@finpro.com
                 </a>
               </div>
 
               <div>
-                <p className="text-gray-600 text-sm mb-1">Phone:</p>
+                <p className="text-gray-600 dark:text-white  text-sm mb-1">Phone:</p>
                 <a className="text-gray-900 font-semibold text-lg hover:text-blue-600">
                   +1 234 567 78
                 </a>
-                <p className="text-gray-500 text-sm mt-1">
+                <p className="text-gray-500 dark:text-white dark:bg-gray- text-sm mt-1">
                   Monday to Friday, 9 AM - 6 PM GMT
                 </p>
               </div>
@@ -144,8 +92,12 @@ export default function ContactPage() {
             </button>
           </div>
 
-          {/* FORM */}
-          <div className="bg-white shadow-lg rounded-2xl p-6 sm:p-8">
+          {/* FORM SECTION */}
+          <form
+            onSubmit={handleSubmit}
+            className="bg-white dark:bg-black shadow-lg rounded-2xl p-6 sm:p-8"
+          >
+            <ToastContainer position={"top-center"} />
             <div className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -196,33 +148,34 @@ export default function ContactPage() {
               </div>
 
               <button
-                onClick={handleSubmit}
-                className="w-full sm:w-auto bg-gray-900 text-white px-6 py-3 rounded-full flex items-center justify-center space-x-3 hover:bg-gray-800"
+                type="submit"
+                disabled={loading}
+                className="w-full sm:w-auto bg-gray-900 text-white px-6 py-3 rounded-full flex items-center justify-center space-x-3 hover:bg-gray-800 disabled:opacity-50"
               >
-                <span>Send Message</span>
+                <span>{loading ? "Sending..." : "Send Message"}</span>
                 <span className="w-10 h-10 flex items-center justify-center bg-white text-black rounded-full">
                   <FaArrowRight />
                 </span>
               </button>
             </div>
-          </div>
+          </form>
         </div>
       </div>
 
       {/* FOOTER */}
-      <footer className="bg-white border-t mt-16">
-        <div className="max-w-7xl mx-auto px-4 py-12">
+      <footer className="bg-white dark:bg-black  border-t mt-16">
+        <div className="max-w-7xl mx-auto px-4  py-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
             <div>
-              <h3 className="font-bold text-gray-900 mb-3">Finpro</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="font-bold dark:text-white text-gray-900 mb-3">Finpro</h3>
+              <p className="text-gray-600  dark:text-white text-sm">
                 Download the Finpro mobile app on App Store or Google Play.
               </p>
             </div>
 
             <div>
-              <h4 className="font-semibold text-gray-900 mb-3">Services</h4>
-              <ul className="space-y-2 text-sm text-gray-600">
+              <h4 className="font-semibold  dark:text-whitetext-gray-900 mb-3">Services</h4>
+              <ul className="space-y-2 dark:text-white text-sm text-gray-600">
                 <li>Digital Wallet Management</li>
                 <li>Investment & Trading</li>
                 <li>Money Transfer</li>
@@ -230,8 +183,8 @@ export default function ContactPage() {
             </div>
 
             <div>
-              <h4 className="font-semibold text-gray-900 mb-3">Company</h4>
-              <ul className="space-y-2 text-sm text-gray-600">
+              <h4 className="font-semibold dark:text-white text-gray-900 mb-3">Company</h4>
+              <ul className="space-y-2 dark:text-white text-sm text-gray-600">
                 <li>About</li>
                 <li>Contact</li>
                 <li>FAQs</li>
@@ -240,10 +193,10 @@ export default function ContactPage() {
             </div>
 
             <div>
-              <h4 className="font-semibold text-gray-900 mb-3">Social Media</h4>
+              <h4 className="font-semibold dark:text-white text-gray-900 mb-3">Social Media</h4>
               <div className="flex space-x-4">
-                <Linkedin size={20} className="text-gray-600" />
-                <Instagram size={20} className="text-gray-600" />
+                <Linkedin size={20} className="text-gray-600 dark:text-white" />
+                <Instagram size={20} className="text-gray-600 dark:text-white" />
               </div>
             </div>
           </div>
