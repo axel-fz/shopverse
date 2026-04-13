@@ -1,20 +1,18 @@
 "use client";
+
 import emailjs from '@emailjs/browser';
-
-
 import React, { useRef, useEffect, useState } from "react";
 import { Linkedin, Instagram } from "lucide-react";
 import { FaArrowRight } from "react-icons/fa";
-/* import Link from "next/link";
- */import Navbar from "@/components/Navbar";
+import Navbar from "@/components/Navbar";
 import { useUser } from "@clerk/nextjs";
 import { toast, ToastContainer } from "react-toastify";
 
 export default function ContactPage() {
 
-   const form = useRef<HTMLFormElement>();
+  // ✅ FIX: pass null as initial value
+  const form = useRef<HTMLFormElement>(null);
 
- 
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -25,11 +23,11 @@ export default function ContactPage() {
   const { isSignedIn, user, isLoaded } = useUser();
   const [loading, setLoading] = useState(false);
 
-  // Prefill form data if user is signed in
   useEffect(() => {
     if (isLoaded && isSignedIn && user) {
       const nameParts = (user.fullName || "").split(" ");
       setFormData({
+        //eslint-disable-next-line react-hooks/exhaustive-deps
         firstName: nameParts[0] || "",
         lastName: nameParts.slice(1).join(" ") || "",
         email: user.primaryEmailAddress?.emailAddress || "",
@@ -47,31 +45,35 @@ export default function ContactPage() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    console.log("Form submitted:", formData);
-    setTimeout(() => setLoading(false), 2000);
 
-     emailjs
+    // ✅ FIX: null-check form.current before using it
+    if (!form.current) {
+      setLoading(false);
+      return;
+    }
+
+    emailjs
       .sendForm('service_w0vy9dc', 'template_kofipjq', form.current, {
         publicKey: 'UVxFQmLjNT6_o64YR',
       })
       .then(
         () => {
-          toast.success("Message sent successfully!")
+          toast.success("Message sent successfully!");
           console.log('SUCCESS!');
+          setLoading(false);
         },
         (error) => {
-          toast.error("failed to send!")
+          toast.error("Failed to send!");
           console.log('FAILED...', error.text);
-        },
+          setLoading(false);
+        }
       );
   };
 
   return (
     <div className="min-h-screen dark:bg-black bg-white">
-      {/* NAVIGATION */}
       <Navbar />
 
-      {/* MAIN */}
       <div className="max-w-7xl mx-auto px-4 pt-40 sm:pt-52 lg:pt-60 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* LEFT SECTION */}
@@ -80,25 +82,31 @@ export default function ContactPage() {
               Get in — <br /> touch with us
             </h1>
 
-            <p className="text-gray-600 dark:text-white  mt-6 mb-8 leading-relaxed">
+            <p className="text-gray-600 dark:text-white mt-6 mb-8 leading-relaxed">
               We&apos;re here to help! Whether you have a question about our
               services or need assistance, our team is ready to assist you.
             </p>
 
             <div className="space-y-4 mb-8">
               <div>
-                <p className="text-gray-600 dark:text-white  text-sm mb-1">Email:</p>
-                <a className="text-gray-900 dark:text-white  font-semibold text-lg hover:text-blue-600">
+                <p className="text-gray-600 dark:text-white text-sm mb-1">Email:</p>
+                <a
+                  href="mailto:hello@finpro.com"
+                  className="text-gray-900 dark:text-white font-semibold text-lg hover:text-blue-600"
+                >
                   hello@finpro.com
                 </a>
               </div>
 
               <div>
-                <p className="text-gray-600 dark:text-white  text-sm mb-1">Phone:</p>
-                <a className="text-gray-900 font-semibold text-lg hover:text-blue-600">
+                <p className="text-gray-600 dark:text-white text-sm mb-1">Phone:</p>
+                <a
+                  href="tel:+123456778"
+                  className="text-gray-900 dark:text-white font-semibold text-lg hover:text-blue-600"
+                >
                   +1 234 567 78
                 </a>
-                <p className="text-gray-500 dark:text-white dark:bg-gray- text-sm mt-1">
+                <p className="text-gray-500 dark:text-white text-sm mt-1">
                   Monday to Friday, 9 AM - 6 PM GMT
                 </p>
               </div>
@@ -118,7 +126,7 @@ export default function ContactPage() {
             ref={form}
             className="bg-white dark:bg-black shadow-lg rounded-2xl p-6 sm:p-8"
           >
-            <ToastContainer position={"top-center"} />
+            <ToastContainer position="top-center" />
             <div className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -131,7 +139,6 @@ export default function ContactPage() {
                     className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-
                 <div>
                   <label className="text-sm font-medium">Last Name</label>
                   <input
@@ -171,7 +178,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full sm:w-auto bg-gray-900 text-white px-6 py-3 rounded-full flex items-center justify-center space-x-3 hover:bg-gray-800 disabled:opacity-50"
+                className="w-full sm:w-auto bg-gray-900 text-white px-6 py-3 rounded-full flex items-center justify-center space-x-3 hover:bg-gray-800 disabled:opacity-50 transition"
               >
                 <span>{loading ? "Sending..." : "Send Message"}</span>
                 <span className="w-10 h-10 flex items-center justify-center bg-white text-black rounded-full">
@@ -184,25 +191,23 @@ export default function ContactPage() {
       </div>
 
       {/* FOOTER */}
-      <footer className="bg-white dark:bg-black  border-t mt-16">
-        <div className="max-w-7xl mx-auto px-4  py-12">
+      <footer className="bg-white dark:bg-black border-t mt-16">
+        <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
             <div>
               <h3 className="font-bold dark:text-white text-gray-900 mb-3">Finpro</h3>
-              <p className="text-gray-600  dark:text-white text-sm">
+              <p className="text-gray-600 dark:text-white text-sm">
                 Download the Finpro mobile app on App Store or Google Play.
               </p>
             </div>
-
             <div>
-              <h4 className="font-semibold  dark:text-whitetext-gray-900 mb-3">Services</h4>
+              <h4 className="font-semibold dark:text-white text-gray-900 mb-3">Services</h4>
               <ul className="space-y-2 dark:text-white text-sm text-gray-600">
                 <li>Digital Wallet Management</li>
                 <li>Investment & Trading</li>
                 <li>Money Transfer</li>
               </ul>
             </div>
-
             <div>
               <h4 className="font-semibold dark:text-white text-gray-900 mb-3">Company</h4>
               <ul className="space-y-2 dark:text-white text-sm text-gray-600">
@@ -212,7 +217,6 @@ export default function ContactPage() {
                 <li>Blog</li>
               </ul>
             </div>
-
             <div>
               <h4 className="font-semibold dark:text-white text-gray-900 mb-3">Social Media</h4>
               <div className="flex space-x-4">
@@ -221,7 +225,6 @@ export default function ContactPage() {
               </div>
             </div>
           </div>
-
           <p className="text-center text-gray-500 text-sm mt-10">
             © 2024 Finpro. All rights reserved.
           </p>
