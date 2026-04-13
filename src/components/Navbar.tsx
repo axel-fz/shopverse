@@ -100,10 +100,13 @@ const Navbar = () => {
           </div>
 
           <div className="relative cursor-pointer">
+            <Link href="/cart" >
             <FiShoppingBag size={22} />
             <span className="absolute w-4 h-4 flex justify-center items-center rounded-full bg-red-500 text-white text-[10px] -right-2 -bottom-1">
               {selectedCardIds.length}
             </span>
+            
+            </Link>
           </div>
 
           <ModeToggle />

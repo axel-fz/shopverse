@@ -1,6 +1,8 @@
 "use client";
+import emailjs from '@emailjs/browser';
 
-import React, { useEffect, useState } from "react";
+
+import React, { useRef, useEffect, useState } from "react";
 import { Linkedin, Instagram } from "lucide-react";
 import { FaArrowRight } from "react-icons/fa";
 /* import Link from "next/link";
@@ -9,6 +11,10 @@ import { useUser } from "@clerk/nextjs";
 import { toast, ToastContainer } from "react-toastify";
 
 export default function ContactPage() {
+
+   const form = useRef<HTMLFormElement>();
+
+ 
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -43,7 +49,21 @@ export default function ContactPage() {
     setLoading(true);
     console.log("Form submitted:", formData);
     setTimeout(() => setLoading(false), 2000);
-    toast.success("Message sent successfully!")
+
+     emailjs
+      .sendForm('service_w0vy9dc', 'template_kofipjq', form.current, {
+        publicKey: 'UVxFQmLjNT6_o64YR',
+      })
+      .then(
+        () => {
+          toast.success("Message sent successfully!")
+          console.log('SUCCESS!');
+        },
+        (error) => {
+          toast.error("failed to send!")
+          console.log('FAILED...', error.text);
+        },
+      );
   };
 
   return (
@@ -95,6 +115,7 @@ export default function ContactPage() {
           {/* FORM SECTION */}
           <form
             onSubmit={handleSubmit}
+            ref={form}
             className="bg-white dark:bg-black shadow-lg rounded-2xl p-6 sm:p-8"
           >
             <ToastContainer position={"top-center"} />

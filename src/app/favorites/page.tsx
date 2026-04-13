@@ -32,8 +32,8 @@ export default function Page() {
   return (
     <>
       <Navbar />
-      <div className="p-10 mt-15">
-        <div className="flex w-full justify-between items-center">
+      <div className=" flex flex-col justify-center p-10 mt-5">
+        <div className="flex w-full mt-20 justify-between items-center">
           <h1 className="text-3xl font-extrabold">My Favorites</h1>
           <button
             className="text-amber font-bold cursor-pointer flex items-center gap-1"

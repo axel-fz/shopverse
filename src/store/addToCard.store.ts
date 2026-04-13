@@ -1,13 +1,13 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-interface useAddtoCardState {
+interface AddToCartState {
   selectedCardIds: number[];
   toggleCard: (id: number) => void;
   clearAll: () => void;
 }
 
-export const useAddtoCard = create<useAddtoCardState>()(
+export const useAddtoCard = create<AddToCartState>()(
   persist(
     (set, get) => ({
       selectedCardIds: [],
@@ -24,7 +24,7 @@ export const useAddtoCard = create<useAddtoCardState>()(
       clearAll: () => set({ selectedCardIds: [] }),
     }),
     {
-      name: 'favorite-store',
+      name: "cart-store", 
     }
   )
 );
