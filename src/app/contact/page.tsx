@@ -10,7 +10,7 @@ import { toast, ToastContainer } from "react-toastify";
 
 export default function ContactPage() {
 
-  // ✅ FIX: pass null as initial value
+  //  FIX: pass null as initial value
   const form = useRef<HTMLFormElement>(null);
 
   const [formData, setFormData] = useState({
@@ -46,7 +46,7 @@ export default function ContactPage() {
     e.preventDefault();
     setLoading(true);
 
-    // ✅ FIX: null-check form.current before using it
+    //  FIX: null-check form.current before using it
     if (!form.current) {
       setLoading(false);
       return;
