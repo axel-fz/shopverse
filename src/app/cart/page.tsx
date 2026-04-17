@@ -38,7 +38,7 @@ export default function CartPage() {
   const fetchProducts = async () => {
     try {
       const res = await axios.get(
-        "https://fakestoreapiserver.reactbd.org/api/walmartproducts?page=1&perPage=20"
+        "https://fakestoreapiserver.reactbd.org/api/walmartproducts?page=1&perPage=20",
       );
       setProducts(res.data.data);
     } catch (error) {
@@ -52,17 +52,17 @@ export default function CartPage() {
   }, []);
 
   const cartProducts = products.filter((product) =>
-    selectedCardIds.includes(product._id)
+    selectedCardIds.includes(product._id),
   );
 
   const totalItems = cartProducts.reduce(
     (acc, item) => acc + (quantities[item._id] || 1),
-    0
+    0,
   );
 
   const totalPriceNumber = cartProducts.reduce(
     (acc, item) => acc + item.price * (quantities[item._id] || 1),
-    0
+    0,
   );
 
   const totalPrice = totalPriceNumber.toFixed(2);
@@ -283,10 +283,7 @@ export default function CartPage() {
                 <div className="relative p-3 rounded-lg bg-amber-50 dark:bg-zinc-800">
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     You need to{" "}
-                    <SignInButton
-                      mode="redirect"
-                      redirectUrl="/cart"
-                    >
+                    <SignInButton mode="redirect" forceRedirectUrl="/cart">
                       <span
                         onClick={() => setVisited(true)}
                         className="text-amber-600 underline cursor-pointer font-semibold"
