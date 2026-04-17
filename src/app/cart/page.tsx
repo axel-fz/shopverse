@@ -283,7 +283,8 @@ export default function CartPage() {
                 <div className="relative p-3 rounded-lg bg-amber-50 dark:bg-zinc-800">
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     You need to{" "}
-                    <SignInButton mode="redirect" forceRedirectUrl="/cart">
+                    <SignInButton mode="redirect"
+                     forceRedirectUrl="/cart">
                       <span
                         onClick={() => setVisited(true)}
                         className="text-amber-600 underline cursor-pointer font-semibold"
